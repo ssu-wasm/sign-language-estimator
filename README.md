@@ -39,6 +39,6 @@
 ### 1. 프로젝트 클론
 
 ```bash
-git clone https://github.com/yourname/wasm-face-age-estimator.git
+git clone https://github.com/ssu-wasm/wasm-face-age-estimator.git
 cd wasm-face-age-estimator
 ```
