@@ -39,3 +39,82 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# C++ / General build artifacts
+*.o
+*.obj
+*.lo
+*.la
+*.al
+*.a
+*.lib
+*.dll
+*.so
+*.so.*
+*.dylib
+*.exe
+*.out
+*.app
+*.ipa
+*.i*86
+*.x86_64
+*.hex
+
+# Debug / Release directories
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+build/
+build-*/
+out/
+bin/
+obj/
+
+# CMake generated files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+CMakeScripts/
+Testing/
+CTestTestfile.cmake
+install_manifest.txt
+
+# VS Code settings
+.vscode/
+*.code-workspace
+
+# CLion / IntelliJ / JetBrains settings
+.idea/
+cmake-build-*/
+
+# Visual Studio local/project files
+*.user
+*.userprefs
+*.opensdf
+*.sdf
+*.cachefile
+*.dbmdl
+*.pdb
+*.ipch
+*.aps
+*.ncb
+*.opendb
+
+# Xcode project settings
+*.xcworkspace
+*.xcuserstate
+*.xcuserdata/
+*.xcodeproj/
+
+# Editor / OS temporary files
+*~
+*.swp
+*.tmp
+Thumbs.db
+.DS_Store
+
+# Local IDE cache (should not be shared)
+.vs/
+CopilotIndices/
