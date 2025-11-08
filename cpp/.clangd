@@ -1,0 +1,22 @@
+# clangd 설정 파일
+# Emscripten 헤더 경로를 찾지 못하는 경우 아래 경로를 수정하세요
+# 일반적인 경로:
+#   ~/emsdk/upstream/emscripten/system/include
+#   /opt/homebrew/opt/emscripten/system/include
+
+CompileFlags:
+  Add:
+    - -I
+    - ~/emsdk/upstream/emscripten/system/include
+    - -I
+    - ~/emsdk/upstream/emscripten/system/include/emscripten
+    - -D__EMSCRIPTEN__
+    - -std=c++17
+  Remove:
+    - -W*
+
+Diagnostics:
+  UnusedIncludes: None
+  MissingIncludes: None
+  Suppress:
+    - unknown_typename # Emscripten 매크로에 대한 경고 무시
