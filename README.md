@@ -36,9 +36,8 @@
 
 ## ⚙️ 설치 및 실행
 
-### 1. 프로젝트 클론
-
 ```bash
-git clone https://github.com/ssu-wasm/wasm-face-age-estimator.git
-cd wasm-face-age-estimator
+nvm use
+pnpm install
+pnpm run dev
 ```
