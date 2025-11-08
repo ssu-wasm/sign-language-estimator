@@ -23,15 +23,14 @@
 
 ## 🧩 기술 스택
 
-| 영역       | 기술                                 | 설명                       |
-| ---------- | ------------------------------------ | -------------------------- |
-| Frontend   | TypeScript / React (Next.js or Vite) | SPA 프레임워크             |
-| AI Engine  | MediaPipe + ONNX Runtime Web         | 얼굴 감지 + 나이 추정      |
-| Runtime    | WebAssembly (WASM)                   | 고속 연산 수행             |
-| WASM Build | C++ + Emscripten                     | C++ 코드를 WASM으로 컴파일 |
-| Video      | WebRTC (getUserMedia)                | 카메라 스트림              |
-| Render     | HTML5 Canvas                         | 실시간 시각화              |
-| Build      | Vite / Next.js App Router            | 번들 및 배포 환경          |
+| 영역      | 기술                                 | 설명                  |
+| --------- | ------------------------------------ | --------------------- |
+| Frontend  | TypeScript / React (Next.js or Vite) | SPA 프레임워크        |
+| AI Engine | MediaPipe + ONNX Runtime Web         | 얼굴 감지 + 나이 추정 |
+| Runtime   | WebAssembly (WASM)                   | 고속 연산 수행        |
+| Video     | WebRTC (getUserMedia)                | 카메라 스트림         |
+| Render    | HTML5 Canvas                         | 실시간 시각화         |
+| Build     | Vite / Next.js App Router            | 번들 및 배포 환경     |
 
 ---
 
@@ -42,44 +41,3 @@ nvm use
 pnpm install
 pnpm run dev
 ```
-
-## WASM 빌드 (C++)
-
-### 사전 요구사항: Emscripten 설치
-
-```bash
-# Emscripten SDK 설치
-git clone https://github.com/emscripten-core/emsdk.git ~/emsdk
-cd ~/emsdk
-./emsdk install latest
-./emsdk activate latest
-source ./emsdk_env.sh
-```
-
-**영구 설정:** `~/.zshrc`에 추가
-
-```bash
-source ~/emsdk/emsdk_env.sh
-```
-
-### 빌드 실행
-
-```bash
-cd cpp
-chmod +x build.sh
-./build.sh
-```
-
-또는 Makefile 직접 사용:
-
-```bash
-cd cpp
-make build
-```
-
-빌드 결과물은 `cpp/build/` 디렉토리에 생성됩니다:
-
-- `age_estimator.js` - JavaScript 래퍼
-- `age_estimator.wasm` - WebAssembly 바이너리
-
-자세한 내용은 [cpp/README.md](./cpp/README.md)를 참고하세요.
