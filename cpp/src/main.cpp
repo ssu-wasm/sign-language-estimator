@@ -7,6 +7,19 @@
 using namespace emscripten;
 
 extern "C" {
+    void process_frame(uint8_t* data, int width, int height) {
+        int numPixels = width * height;
+        for (int i = 0; i < numPixels; ++i) {
+            int idx = i * 4; // RGBA
+
+            // 초록색으로 채우기 (G=255)
+            data[idx + 0] = 0;   // R
+            data[idx + 1] = 255; // G
+            data[idx + 2] = 0;   // B
+            data[idx + 3] = 255; // A
+        }
+    }
+
      void applyGrayscale(uintptr_t bufferPtr, int width, int height) {
         uint8_t* data = reinterpret_cast<uint8_t*>(bufferPtr);
         const int length = width * height * 4; // RGBA
