@@ -14,10 +14,20 @@ export default function Home() {
   useEffect(() => {
     const loadWasm = async () => {
       try {
-        const CreateMyModule = (await import("../wasm/my_module.js")).default;
+        const response = await fetch("/wasm/my_module.js");
+        const scriptText = await response.text();
+
+        const executeScript = new Function(
+          scriptText + "; return CreateMyModule;"
+        );
+        const CreateMyModule = executeScript();
+
+        if (CreateMyModule == null) {
+          throw new Error("CreateMyModule을 찾을 수 없습니다");
+        }
+
         const wasmInstance = await CreateMyModule({
           locateFile: (path: string) => {
-            // WASM 파일 경로를 올바르게 지정
             if (path.endsWith(".wasm")) {
               return `/wasm/${path}`;
             }
@@ -50,11 +60,11 @@ export default function Home() {
     <div className={styles.page}>
       <h1>WASM Face Age Estimator</h1>
 
-      {loading && <p>Loading WASM module...</p>}
+      {loading ? <p>Loading WASM module...</p> : null}
 
-      {error && <p style={{ color: "red" }}>Error: {error}</p>}
+      {error ? <p style={{ color: "red" }}>Error: {error}</p> : null}
 
-      {wasmModule && (
+      {wasmModule ? (
         <div>
           <p style={{ color: "green" }}>WASM module loaded successfully!</p>
           <button onClick={testWasmFunction}>Test WASM Function</button>
@@ -64,7 +74,7 @@ export default function Home() {
             <pre>{JSON.stringify(Object.keys(wasmModule), null, 2)}</pre>
           </div>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }
