@@ -1,7 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import styles from "./page.module.css";
-import { Webcam } from "./components/webcam";
+
+import { CameraToWasm } from "./components/camera-to-wasm";
 
 interface WasmModule {
   add: (a: number, b: number) => number;
@@ -76,7 +77,7 @@ export default function Home() {
           </div>
         </div>
       ) : null}
-      <Webcam />
+      <CameraToWasm />
     </div>
   );
 }
