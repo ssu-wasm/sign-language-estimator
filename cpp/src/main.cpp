@@ -7,14 +7,23 @@
 using namespace emscripten;
 
 extern "C" {
-    int add(int a, int b) {
-        return a + b;
+     void applyGrayscale(uintptr_t bufferPtr, int width, int height) {
+        uint8_t* data = reinterpret_cast<uint8_t*>(bufferPtr);
+        const int length = width * height * 4; // RGBA
+
+        for (int i = 0; i < length; i += 4) {
+            uint8_t r = data[i];
+            uint8_t g = data[i + 1];
+            uint8_t b = data[i + 2];
+
+            uint8_t gray = static_cast<uint8_t>((r + g + b) / 3);
+            
+            data[i] = gray;
+            data[i + 1] = gray;
+            data[i + 2] = gray;
+        }
     }
-    
-    int multiply(int a, int b) {
-        return a * b;
-    }
-    
+
     float estimate_age_simple(float face_width, float face_height) {
         // Simple age estimation algorithm based on face proportions
         float ratio = face_height / face_width;
@@ -71,8 +80,7 @@ private:
 };
 
 EMSCRIPTEN_BINDINGS(my_module) {
-    function("add", &add);
-    function("multiply", &multiply);
+    function("applyGrayscale", &applyGrayscale);
     function("estimate_age_simple", &estimate_age_simple);
     
     class_<FaceAgeEstimator>("FaceAgeEstimator")
