@@ -183,20 +183,27 @@ export default function AISignDetectorExample() {
       ctx.fill();
     });
 
-    // 손가락 연결선 그리기
+    // MediaPipe Hand 랜드마크 연결선 (정확한 구조)
     const connections = [
-      [0, 1, 2, 3, 4], // 엄지
-      [0, 5, 6, 7, 8], // 검지
-      [0, 9, 10, 11, 12], // 중지
-      [0, 13, 14, 15, 16], // 약지
-      [0, 17, 18, 19, 20], // 새끼
+      // 손목에서 손가락 베이스로
+      [0, 1], [0, 5], [0, 9], [0, 13], [0, 17],
+      // 엄지
+      [1, 2], [2, 3], [3, 4],
+      // 검지
+      [5, 6], [6, 7], [7, 8],
+      // 중지
+      [9, 10], [10, 11], [11, 12],
+      // 약지
+      [13, 14], [14, 15], [15, 16],
+      // 새끼
+      [17, 18], [18, 19], [19, 20],
     ];
 
-    connections.forEach((connection) => {
-      for (let i = 0; i < connection.length - 1; i++) {
-        const start = landmarks[connection[i]];
-        const end = landmarks[connection[i + 1]];
+    connections.forEach(([startIdx, endIdx]) => {
+      const start = landmarks[startIdx];
+      const end = landmarks[endIdx];
 
+      if (start && end) {
         ctx.beginPath();
         ctx.moveTo(start.x * canvas.width, start.y * canvas.height);
         ctx.lineTo(end.x * canvas.width, end.y * canvas.height);

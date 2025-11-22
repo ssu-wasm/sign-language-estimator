@@ -62,9 +62,9 @@ export class MediaPipeHandDetector {
       });
 
       this.hands.setOptions({
-        maxNumHands: 2,
+        maxNumHands: 1, // 한 손만 처리하므로 1로 설정
         modelComplexity: 1,
-        minDetectionConfidence: 0.5,
+        minDetectionConfidence: 0.7, // 더 정확한 검출을 위해 임계값 상향
         minTrackingConfidence: 0.5,
       });
 

@@ -20,6 +20,8 @@ interface WasmModule {
   _malloc: (size: number) => number;
   _free: (ptr: number) => void;
   HEAPF32?: Float32Array; // optional - recognizeFromPointer 사용 시 필요
+  HEAPU8?: Uint8Array; // 메모리 버퍼 접근용
+  [key: string]: unknown; // 동적 속성 허용
 }
 
 interface SignRecognizerInstance {
@@ -212,6 +214,12 @@ export class WASMSignRecognizer {
       // SignRecognizer 인스턴스 생성
       try {
         this.recognizer = new this.wasmModule.SignRecognizer();
+        console.log("✅ SignRecognizer 인스턴스 생성 성공");
+        console.log("recognizer 메서드:", Object.keys(this.recognizer));
+        console.log(
+          "recognizeFromPointer 타입:",
+          typeof this.recognizer.recognizeFromPointer
+        );
       } catch (error) {
         console.error("❌ SignRecognizer 인스턴스 생성 실패:", error);
         return false;
@@ -220,6 +228,22 @@ export class WASMSignRecognizer {
       if (!this.recognizer) {
         console.error("❌ SignRecognizer 인스턴스가 null입니다");
         return false;
+      }
+
+      // recognizeFromPointer 메서드 확인 (경고만, 계속 진행)
+      if (
+        !this.recognizer.recognizeFromPointer ||
+        typeof this.recognizer.recognizeFromPointer !== "function"
+      ) {
+        console.warn("⚠️ recognizeFromPointer 메서드를 찾을 수 없습니다");
+        console.warn("사용 가능한 메서드:", Object.keys(this.recognizer));
+        console.warn(
+          "recognizer 프로토타입:",
+          Object.getPrototypeOf(this.recognizer)
+        );
+        // 계속 진행 (런타임에 다시 확인)
+      } else {
+        console.log("✅ recognizeFromPointer 메서드 확인됨");
       }
 
       try {
@@ -269,12 +293,33 @@ export class WASMSignRecognizer {
       };
     }
 
-    // HEAPF32가 없으면 일반 recognize 메서드 사용
-    if (!this.wasmModule.HEAPF32) {
-      console.warn(
-        "HEAPF32가 사용 불가능합니다. 일반 recognize 메서드를 사용합니다."
-      );
-      return this.recognize(landmarks);
+    // HEAPF32 접근 방법 개선
+    let HEAPF32: Float32Array | undefined = this.wasmModule.HEAPF32;
+
+    // HEAPF32가 없으면 동적으로 접근 시도
+    if (!HEAPF32) {
+      try {
+        // 모듈에서 직접 접근 시도
+        HEAPF32 = this.wasmModule.HEAPF32;
+
+        // 여전히 없으면 HEAPU8 버퍼로부터 생성
+        if (!HEAPF32 && this.wasmModule.HEAPU8?.buffer) {
+          HEAPF32 = new Float32Array(this.wasmModule.HEAPU8.buffer);
+          console.log("✅ HEAPF32를 HEAPU8 버퍼로부터 생성");
+        }
+      } catch (error) {
+        console.warn("HEAPF32 접근 중 오류:", error);
+      }
+    }
+
+    // HEAPF32가 없으면 오류 반환
+    if (!HEAPF32) {
+      console.error("❌ HEAPF32를 찾을 수 없습니다");
+      return {
+        gesture: "감지되지 않음",
+        confidence: 0.0,
+        id: 0,
+      };
     }
 
     try {
@@ -295,21 +340,60 @@ export class WASMSignRecognizer {
       }
 
       // 메모리에 데이터 복사
-      this.wasmModule.HEAPF32.set(landmarkData, landmarksPtr / 4);
+      HEAPF32.set(landmarkData, landmarksPtr / 4);
 
       // 인식 수행
-      const resultJson = this.recognizer.recognizeFromPointer(landmarksPtr, 42);
+      console.log("🔄 WASM recognizeFromPointer 호출 중...");
+      console.log("recognizer:", this.recognizer);
+      console.log(
+        "recognizeFromPointer:",
+        this.recognizer.recognizeFromPointer
+      );
+      console.log("타입:", typeof this.recognizer.recognizeFromPointer);
+      console.log("사용 가능한 메서드:", Object.keys(this.recognizer));
+
+      // recognizeFromPointer가 없거나 함수가 아닌 경우
+      if (
+        !this.recognizer.recognizeFromPointer ||
+        typeof this.recognizer.recognizeFromPointer !== "function"
+      ) {
+        console.error(
+          "❌ recognizeFromPointer가 함수가 아닙니다. 사용 가능한 메서드:",
+          Object.keys(this.recognizer)
+        );
+        // 메모리 해제
+        this.wasmModule._free(landmarksPtr);
+        throw new Error(
+          "recognizeFromPointer가 함수가 아닙니다. 사용 가능한 메서드: " +
+            Object.keys(this.recognizer).join(", ")
+        );
+      }
+
+      let resultJson: string;
+      try {
+        resultJson = this.recognizer.recognizeFromPointer(landmarksPtr, 42);
+        console.log("✅ WASM 인식 결과:", resultJson);
+      } catch (error) {
+        // 메모리 해제
+        this.wasmModule._free(landmarksPtr);
+        throw error;
+      }
 
       // 메모리 해제
       this.wasmModule._free(landmarksPtr);
 
       // JSON 파싱
       const result = JSON.parse(resultJson) as RecognitionResult;
+      console.log("✅ WASM 인식 완료:", result);
       return result;
     } catch (error) {
       console.error("WASM 인식 오류:", error);
-      // 오류 발생 시 일반 recognize 메서드로 fallback
-      return this.recognize(landmarks);
+
+      return {
+        gesture: "감지되지 않음",
+        confidence: 0.0,
+        id: 0,
+      };
     }
   }
 

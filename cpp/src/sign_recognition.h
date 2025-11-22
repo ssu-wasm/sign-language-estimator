@@ -64,30 +64,6 @@ private:
     float recognitionThreshold;
 };
 
-// Embind 바인딩
-EMSCRIPTEN_BINDINGS(sign_recognition) {
-    emscripten::class_<HandLandmark>("HandLandmark")
-        .constructor<>()
-        .property("x", &HandLandmark::x)
-        .property("y", &HandLandmark::y)
-        .property("z", &HandLandmark::z);
-    
-    emscripten::class_<RecognitionResult>("RecognitionResult")
-        .constructor<>()
-        .property("gesture", &RecognitionResult::gesture)
-        .property("confidence", &RecognitionResult::confidence)
-        .property("id", &RecognitionResult::id);
-    
-    emscripten::class_<SignRecognizer>("SignRecognizer")
-        .constructor<>()
-        .function("initialize", &SignRecognizer::initialize)
-        .function("recognize", &SignRecognizer::recognize)
-        .function("recognizeFromPointer", &SignRecognizer::recognizeFromPointer)
-        .function("setDetectionThreshold", &SignRecognizer::setDetectionThreshold)
-        .function("setRecognitionThreshold", &SignRecognizer::setRecognitionThreshold)
-        .function("getVersion", &SignRecognizer::getVersion);
-    
-    emscripten::register_vector<HandLandmark>("VectorHandLandmark");
-}
+// Embind 바인딩은 main.cpp에서 처리
 
 #endif // SIGN_RECOGNITION_H

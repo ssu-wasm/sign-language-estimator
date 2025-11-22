@@ -113,23 +113,37 @@ export class MLSignRecognizer {
     // WASM 사용
     if (this.isModelLoaded && this.wasmRecognizer) {
       try {
+        console.log("🔄 WASM 인식 시도 중...");
         const result = await this.wasmRecognizer.recognizeFast(landmarks);
+        console.log("✅ WASM 인식 결과:", result);
+
+        // WASM이 "감지되지 않음"을 반환한 경우에도 WASM 결과를 사용
+        // (규칙 기반으로 폴백하지 않음)
         return {
           gesture: result.gesture,
           confidence: result.confidence,
           id: result.id,
         };
       } catch (error) {
-        console.error("WASM 인식 오류:", error);
-        // WASM 실패 시 규칙 기반으로 폴백
+        console.error("❌ WASM 인식 오류:", error);
+        // WASM 실패 시에만 규칙 기반으로 폴백
         const ruleBasedResult = this.recognizeByRules(landmarks);
         if (ruleBasedResult) {
+          console.log("⚠️ 규칙 기반 인식으로 폴백:", ruleBasedResult);
           return ruleBasedResult;
         }
       }
+    } else {
+      console.warn(
+        "⚠️ WASM이 로드되지 않았습니다. isModelLoaded:",
+        this.isModelLoaded,
+        "wasmRecognizer:",
+        !!this.wasmRecognizer
+      );
     }
 
     // WASM이 로드되지 않았거나 실패한 경우 규칙 기반 인식
+    console.log("⚠️ 규칙 기반 인식 사용");
     const ruleBasedResult = this.recognizeByRules(landmarks);
     if (ruleBasedResult) {
       return ruleBasedResult;

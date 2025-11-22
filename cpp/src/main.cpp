@@ -9,8 +9,71 @@ extern "C" {
     }
 }
 
-// Embind로 C 함수도 바인딩
+// WASM 바인딩을 위한 래퍼 함수
+class SignRecognizerWrapper {
+public:
+    SignRecognizer recognizer;
+    
+    SignRecognizerWrapper() {}
+    
+    bool initialize() {
+        return recognizer.initialize();
+    }
+    
+    RecognitionResult recognize(const std::vector<HandLandmark>& landmarks) {
+        return recognizer.recognize(landmarks);
+    }
+    
+    std::string recognizeFromPointer(uintptr_t landmarksPtr, int count) {
+        float* landmarks = reinterpret_cast<float*>(landmarksPtr);
+        return recognizer.recognizeFromPointer(landmarks, count);
+    }
+    
+    void setDetectionThreshold(float threshold) {
+        recognizer.setDetectionThreshold(threshold);
+    }
+    
+    void setRecognitionThreshold(float threshold) {
+        recognizer.setRecognitionThreshold(threshold);
+    }
+    
+    std::string getVersion() {
+        return recognizer.getVersion();
+    }
+};
+
+// Embind 바인딩
 EMSCRIPTEN_BINDINGS(sign_wasm_module) {
-    emscripten::function("test_function", &test_function);
+    using namespace emscripten;
+    
+    // C 스타일 함수 바인딩
+    function("test_function", &test_function, allow_raw_pointers());
+    
+    // HandLandmark 구조체 바인딩
+    class_<HandLandmark>("HandLandmark")
+        .constructor<>()
+        .property("x", &HandLandmark::x)
+        .property("y", &HandLandmark::y)
+        .property("z", &HandLandmark::z);
+    
+    // RecognitionResult 구조체 바인딩
+    class_<RecognitionResult>("RecognitionResult")
+        .constructor<>()
+        .property("gesture", &RecognitionResult::gesture)
+        .property("confidence", &RecognitionResult::confidence)
+        .property("id", &RecognitionResult::id);
+    
+    // SignRecognizer 래퍼 클래스 바인딩
+    class_<SignRecognizerWrapper>("SignRecognizer")
+        .constructor<>()
+        .function("initialize", &SignRecognizerWrapper::initialize)
+        .function("recognize", &SignRecognizerWrapper::recognize)
+        .function("recognizeFromPointer", &SignRecognizerWrapper::recognizeFromPointer)
+        .function("setDetectionThreshold", &SignRecognizerWrapper::setDetectionThreshold)
+        .function("setRecognitionThreshold", &SignRecognizerWrapper::setRecognitionThreshold)
+        .function("getVersion", &SignRecognizerWrapper::getVersion);
+    
+    // std::vector<HandLandmark> 바인딩
+    register_vector<HandLandmark>("VectorHandLandmark");
 }
 
