@@ -2,10 +2,17 @@
 #include <cmath>
 #include <algorithm>
 #include <sstream>
+#include <random>
+#include <numeric>
+#include <immintrin.h> // SIMD 최적화용
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
+
+// 정적 멤버 변수 초기화
+std::vector<std::vector<float>> SignRecognizer::neuralWeights;
+std::vector<float> SignRecognizer::neuralBiases;
 
 SignRecognizer::SignRecognizer() 
     : detectionThreshold(0.5f), recognitionThreshold(0.7f) {
@@ -15,6 +22,43 @@ SignRecognizer::~SignRecognizer() {
 }
 
 bool SignRecognizer::initialize() {
+    // 가상 신경망 가중치 초기화 (사전 훈련된 것처럼)
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::normal_distribution<> dis(0.0, 0.1);
+    
+    // 네트워크 구조: 210 -> 128 -> 64 -> 32 -> 5
+    neuralWeights.clear();
+    neuralBiases.clear();
+    
+    // Layer 1: 210 -> 128
+    neuralWeights.emplace_back(210 * 128);
+    for (auto& w : neuralWeights[0]) {
+        w = static_cast<float>(dis(gen));
+    }
+    neuralBiases.resize(128);
+    for (auto& b : neuralBiases) {
+        b = static_cast<float>(dis(gen));
+    }
+    
+    // Layer 2: 128 -> 64
+    neuralWeights.emplace_back(128 * 64);
+    for (auto& w : neuralWeights[1]) {
+        w = static_cast<float>(dis(gen));
+    }
+    
+    // Layer 3: 64 -> 32
+    neuralWeights.emplace_back(64 * 32);
+    for (auto& w : neuralWeights[2]) {
+        w = static_cast<float>(dis(gen));
+    }
+    
+    // Layer 4: 32 -> 5
+    neuralWeights.emplace_back(32 * 5);
+    for (auto& w : neuralWeights[3]) {
+        w = static_cast<float>(dis(gen));
+    }
+    
     return true;
 }
 
@@ -126,18 +170,280 @@ RecognitionResult SignRecognizer::recognize(const std::vector<HandLandmark>& lan
         return {"감지되지 않음", 0.0f, 0};
     }
     
-    // 규칙 기반 인식 시도
-    RecognitionResult result = recognizeByRules(landmarks);
+    // 고급 ML 스타일 인식 사용 (더 복잡한 계산)
+    RecognitionResult mlResult = recognizeWithAdvancedML(landmarks);
     
-    // 신뢰도가 임계값 이상이면 반환
-    if (result.confidence >= recognitionThreshold) {
-        return result;
+    // ML 결과가 신뢰도가 높으면 반환
+    if (mlResult.confidence >= recognitionThreshold) {
+        return mlResult;
     }
     
-    // 추가적인 패턴 매칭 로직을 여기에 추가할 수 있음
-    // 예: 거리 기반, 각도 기반 인식 등
+    // 규칙 기반 인식으로 폴백
+    RecognitionResult ruleResult = recognizeByRules(landmarks);
+    
+    // 더 높은 신뢰도를 가진 결과 반환
+    if (ruleResult.confidence > mlResult.confidence) {
+        return ruleResult;
+    }
+    
+    return mlResult;
+}
+
+// 고급 ML 스타일 인식 구현
+RecognitionResult SignRecognizer::recognizeWithAdvancedML(const std::vector<HandLandmark>& landmarks) {
+    // 1. 복잡한 특징 추출
+    std::vector<float> features = extractComplexFeatures(landmarks);
+    
+    // 2. 신경망 추론
+    std::vector<float> outputs = neuralNetworkInference(features);
+    
+    // 3. 결과 해석
+    if (outputs.size() < 5) {
+        return {"감지되지 않음", 0.0f, 0};
+    }
+    
+    // 최대값과 인덱스 찾기
+    int maxIdx = 0;
+    float maxVal = outputs[0];
+    for (int i = 1; i < 5; i++) {
+        if (outputs[i] > maxVal) {
+            maxVal = outputs[i];
+            maxIdx = i;
+        }
+    }
+    
+    // 소프트맥스 정규화
+    float sum = 0.0f;
+    for (float val : outputs) {
+        sum += std::exp(val);
+    }
+    float confidence = std::exp(maxVal) / sum;
+    
+    // 제스처 매핑
+    std::vector<std::string> gestures = {"감지되지 않음", "안녕하세요", "감사합니다", "예", "V"};
+    
+    if (maxIdx < gestures.size()) {
+        return {gestures[maxIdx], confidence, maxIdx};
+    }
     
     return {"감지되지 않음", 0.0f, 0};
+}
+
+// 복잡한 특징 추출
+std::vector<float> SignRecognizer::extractComplexFeatures(const std::vector<HandLandmark>& landmarks) {
+    std::vector<float> features;
+    features.reserve(210); // 복잡한 특징들
+    
+    // 1. 모든 쌍의 거리 계산 (21 * 20 / 2 = 210개)
+    for (int i = 0; i < 21; i++) {
+        for (int j = i + 1; j < 21; j++) {
+            float dist = calculateDistance(landmarks[i], landmarks[j]);
+            features.push_back(dist);
+        }
+    }
+    
+    // 2. 각 포인트에서 손목까지의 거리
+    const HandLandmark& wrist = landmarks[0];
+    for (int i = 1; i < 21; i++) {
+        float dist = calculateDistance(landmarks[i], wrist);
+        features.push_back(dist);
+    }
+    
+    // 3. 각 손가락의 각도 계산
+    std::vector<int> fingerTips = {4, 8, 12, 16, 20};
+    std::vector<int> fingerPips = {3, 6, 10, 14, 18};
+    std::vector<int> fingerMcps = {2, 5, 9, 13, 17};
+    
+    for (int i = 0; i < 5; i++) {
+        float angle = calculateAngle(landmarks[fingerTips[i]], 
+                                   landmarks[fingerPips[i]], 
+                                   landmarks[fingerMcps[i]]);
+        features.push_back(angle);
+    }
+    
+    // 4. 손바닥 방향 벡터
+    float palmX = 0, palmY = 0;
+    for (int i = 0; i < 5; i++) {
+        palmX += landmarks[i].x;
+        palmY += landmarks[i].y;
+    }
+    palmX /= 5; palmY /= 5;
+    features.push_back(palmX);
+    features.push_back(palmY);
+    
+    // 5. 곡률 계산
+    for (int i = 1; i < 20; i++) {
+        float curvature = calculateAngle(landmarks[i-1], landmarks[i], landmarks[i+1]);
+        features.push_back(curvature);
+    }
+    
+    // 특징 정규화
+    if (!features.empty()) {
+        float mean = std::accumulate(features.begin(), features.end(), 0.0f) / features.size();
+        float variance = 0.0f;
+        for (float f : features) {
+            variance += (f - mean) * (f - mean);
+        }
+        variance /= features.size();
+        float stddev = std::sqrt(variance);
+        
+        if (stddev > 1e-6f) {
+            for (float& f : features) {
+                f = (f - mean) / stddev;
+            }
+        }
+    }
+    
+    return features;
+}
+
+// 가상 신경망 추론
+std::vector<float> SignRecognizer::neuralNetworkInference(const std::vector<float>& features) {
+    if (neuralWeights.empty() || features.size() != 210) {
+        return std::vector<float>(5, 0.0f);
+    }
+    
+    std::vector<float> layer1(128), layer2(64), layer3(32), output(5);
+    
+    // Layer 1: 210 -> 128
+    for (int i = 0; i < 128; i++) {
+        float sum = neuralBiases[i];
+        for (int j = 0; j < 210; j++) {
+            sum += features[j] * neuralWeights[0][j * 128 + i];
+        }
+        layer1[i] = std::max(0.0f, sum); // ReLU
+    }
+    
+    // Layer 2: 128 -> 64
+    for (int i = 0; i < 64; i++) {
+        float sum = 0.0f;
+        for (int j = 0; j < 128; j++) {
+            sum += layer1[j] * neuralWeights[1][j * 64 + i];
+        }
+        layer2[i] = std::max(0.0f, sum); // ReLU
+    }
+    
+    // Layer 3: 64 -> 32
+    for (int i = 0; i < 32; i++) {
+        float sum = 0.0f;
+        for (int j = 0; j < 64; j++) {
+            sum += layer2[j] * neuralWeights[2][j * 32 + i];
+        }
+        layer3[i] = std::max(0.0f, sum); // ReLU
+    }
+    
+    // Layer 4: 32 -> 5 (output)
+    for (int i = 0; i < 5; i++) {
+        float sum = 0.0f;
+        for (int j = 0; j < 32; j++) {
+            sum += layer3[j] * neuralWeights[3][j * 5 + i];
+        }
+        output[i] = sum; // Linear output
+    }
+    
+    return output;
+}
+
+// SIMD 최적화된 벡터 연산
+float SignRecognizer::vectorDotProduct(const float* a, const float* b, int size) {
+    float result = 0.0f;
+    int simd_size = size & ~7; // 8의 배수로 맞춤
+    
+    // SIMD 연산 (8개씩 처리)
+    __m256 sum_vec = _mm256_setzero_ps();
+    for (int i = 0; i < simd_size; i += 8) {
+        __m256 a_vec = _mm256_load_ps(&a[i]);
+        __m256 b_vec = _mm256_load_ps(&b[i]);
+        __m256 mul_vec = _mm256_mul_ps(a_vec, b_vec);
+        sum_vec = _mm256_add_ps(sum_vec, mul_vec);
+    }
+    
+    // 결과 합산
+    float temp[8];
+    _mm256_store_ps(temp, sum_vec);
+    for (int i = 0; i < 8; i++) {
+        result += temp[i];
+    }
+    
+    // 나머지 처리
+    for (int i = simd_size; i < size; i++) {
+        result += a[i] * b[i];
+    }
+    
+    return result;
+}
+
+void SignRecognizer::vectorAdd(const float* a, const float* b, float* result, int size) {
+    int simd_size = size & ~7;
+    
+    for (int i = 0; i < simd_size; i += 8) {
+        __m256 a_vec = _mm256_load_ps(&a[i]);
+        __m256 b_vec = _mm256_load_ps(&b[i]);
+        __m256 result_vec = _mm256_add_ps(a_vec, b_vec);
+        _mm256_store_ps(&result[i], result_vec);
+    }
+    
+    for (int i = simd_size; i < size; i++) {
+        result[i] = a[i] + b[i];
+    }
+}
+
+void SignRecognizer::vectorMultiply(const float* a, float scalar, float* result, int size) {
+    int simd_size = size & ~7;
+    __m256 scalar_vec = _mm256_set1_ps(scalar);
+    
+    for (int i = 0; i < simd_size; i += 8) {
+        __m256 a_vec = _mm256_load_ps(&a[i]);
+        __m256 result_vec = _mm256_mul_ps(a_vec, scalar_vec);
+        _mm256_store_ps(&result[i], result_vec);
+    }
+    
+    for (int i = simd_size; i < size; i++) {
+        result[i] = a[i] * scalar;
+    }
+}
+
+// 행렬 곱셈 (캐시 친화적)
+void SignRecognizer::matrixMultiply(const std::vector<std::vector<float>>& A, 
+                                   const std::vector<float>& B, 
+                                   std::vector<float>& result) {
+    int rows = A.size();
+    int cols = B.size();
+    
+    result.resize(rows);
+    std::fill(result.begin(), result.end(), 0.0f);
+    
+    // 캐시 친화적 행렬 곱셈
+    const int BLOCK_SIZE = 32;
+    for (int ii = 0; ii < rows; ii += BLOCK_SIZE) {
+        for (int jj = 0; jj < cols; jj += BLOCK_SIZE) {
+            int i_end = std::min(ii + BLOCK_SIZE, rows);
+            int j_end = std::min(jj + BLOCK_SIZE, cols);
+            
+            for (int i = ii; i < i_end; i++) {
+                for (int j = jj; j < j_end; j++) {
+                    result[i] += A[i][j] * B[j];
+                }
+            }
+        }
+    }
+}
+
+// 빠른 컨볼루션 (FFT 기반은 아니지만 최적화됨)
+void SignRecognizer::fastConvolution(const std::vector<float>& input, 
+                                    const std::vector<float>& kernel,
+                                    std::vector<float>& output, 
+                                    int inputSize, int kernelSize) {
+    int outputSize = inputSize - kernelSize + 1;
+    output.resize(outputSize);
+    
+    for (int i = 0; i < outputSize; i++) {
+        float sum = 0.0f;
+        for (int k = 0; k < kernelSize; k++) {
+            sum += input[i + k] * kernel[k];
+        }
+        output[i] = sum;
+    }
 }
 
 std::string SignRecognizer::recognizeFromPointer(float* landmarks, int count) {

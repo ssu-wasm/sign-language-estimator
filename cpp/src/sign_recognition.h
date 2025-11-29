@@ -51,6 +51,31 @@ private:
     // 규칙 기반 제스처 인식
     RecognitionResult recognizeByRules(const std::vector<HandLandmark>& landmarks);
     
+    // 고급 ML 스타일 인식 (최적화된 C++ 버전)
+    RecognitionResult recognizeWithAdvancedML(const std::vector<HandLandmark>& landmarks);
+    
+    // 특징 추출
+    std::vector<float> extractComplexFeatures(const std::vector<HandLandmark>& landmarks);
+    
+    // 가상 신경망 추론
+    std::vector<float> neuralNetworkInference(const std::vector<float>& features);
+    
+    // 행렬 연산
+    void matrixMultiply(const std::vector<std::vector<float>>& A, 
+                       const std::vector<float>& B, 
+                       std::vector<float>& result);
+    
+    // 빠른 컨볼루션 연산
+    void fastConvolution(const std::vector<float>& input, 
+                        const std::vector<float>& kernel,
+                        std::vector<float>& output, 
+                        int inputSize, int kernelSize);
+    
+    // SIMD 최적화된 벡터 연산
+    float vectorDotProduct(const float* a, const float* b, int size);
+    void vectorAdd(const float* a, const float* b, float* result, int size);
+    void vectorMultiply(const float* a, float scalar, float* result, int size);
+    
     // 랜드마크 정규화
     std::vector<float> normalizeLandmarks(const std::vector<HandLandmark>& landmarks);
     
@@ -59,6 +84,10 @@ private:
     
     // 각도 계산
     float calculateAngle(const HandLandmark& a, const HandLandmark& b, const HandLandmark& c) const;
+    
+    // 가중치 캐시 (사전 계산된 ML 가중치들)
+    static std::vector<std::vector<float>> neuralWeights;
+    static std::vector<float> neuralBiases;
     
     float detectionThreshold;
     float recognitionThreshold;

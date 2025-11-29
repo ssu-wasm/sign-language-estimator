@@ -271,12 +271,6 @@
 
 // export default DataCollector;
 
-
-
-
-
-
-
 // src/components/DataCollector.js
 
 import React, { useEffect, useRef, useState } from "react";
@@ -329,7 +323,7 @@ const DataCollector = () => {
   const captionTimeoutRef = useRef(null);
 
   const counts = LABELS.reduce((acc, l) => {
-    acc[l.key] = dataset.filter(d => d.label === l.key).length;
+    acc[l.key] = dataset.filter((d) => d.label === l.key).length;
     return acc;
   }, {});
 
@@ -453,7 +447,7 @@ const DataCollector = () => {
       const handsResult = {
         landmarks: results.multiHandLandmarks || [],
         handedness:
-          results.multiHandedness?.map(h => ({ label: h.label })) || [],
+          results.multiHandedness?.map((h) => ({ label: h.label })) || [],
       };
 
       const feature = landmarksToFeature(handsResult);
@@ -511,12 +505,12 @@ const DataCollector = () => {
     const dim = dataset[0].vector.length;
     const header = ["label", ...Array.from({ length: dim }, (_, i) => `f${i}`)];
 
-    const rows = dataset.map(d => [
+    const rows = dataset.map((d) => [
       d.label,
-      ...d.vector.map(v => Number.isFinite(v) ? v : 0),
+      ...d.vector.map((v) => (Number.isFinite(v) ? v : 0)),
     ]);
 
-    const csv = [header, ...rows].map(r => r.join(",")).join("\n");
+    const csv = [header, ...rows].map((r) => r.join(",")).join("\n");
 
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
@@ -527,7 +521,7 @@ const DataCollector = () => {
     URL.revokeObjectURL(url);
   };
 
-  const allDone = LABELS.every(l => counts[l.key] >= TARGET_PER_LABEL);
+  const allDone = LABELS.every((l) => counts[l.key] >= TARGET_PER_LABEL);
 
   return (
     <div style={{ display: "grid", gap: 12, padding: 12 }}>
@@ -536,14 +530,24 @@ const DataCollector = () => {
       <div style={{ position: "relative", width: 640, height: 480 }}>
         <video
           ref={videoRef}
-          style={{ position: "absolute", width: 640, height: 480, transform: "scaleX(-1)" }}
+          style={{
+            position: "absolute",
+            width: 640,
+            height: 480,
+            transform: "scaleX(-1)",
+          }}
           autoPlay
           playsInline
           muted
         />
         <canvas
           ref={canvasRef}
-          style={{ position: "absolute", width: 640, height: 480, transform: "scaleX(-1)" }}
+          style={{
+            position: "absolute",
+            width: 640,
+            height: 480,
+            transform: "scaleX(-1)",
+          }}
         />
         <div
           style={{
@@ -596,7 +600,8 @@ const DataCollector = () => {
       )}
 
       <div style={{ fontSize: 18 }}>
-        <b>WASM 수어 번역 :</b> {LABEL_DISPLAY[prediction.label] ?? prediction.label}
+        <b>WASM 수어 번역 :</b>{" "}
+        {LABEL_DISPLAY[prediction.label] ?? prediction.label}
         <span style={{ marginLeft: 8, opacity: 0.7 }}>
           ({prediction.score.toFixed(3)})
         </span>
@@ -606,7 +611,7 @@ const DataCollector = () => {
       </div>
 
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-        {LABELS.map(l => {
+        {LABELS.map((l) => {
           const c = counts[l.key] ?? 0;
           const done = c >= TARGET_PER_LABEL;
           return (
@@ -617,7 +622,8 @@ const DataCollector = () => {
               style={{
                 padding: "8px 10px",
                 borderRadius: 8,
-                border: currentLabel === l.key ? "2px solid #00c" : "1px solid #999",
+                border:
+                  currentLabel === l.key ? "2px solid #00c" : "1px solid #999",
                 background: done ? "#d4ffd4" : "#fff",
               }}
             >

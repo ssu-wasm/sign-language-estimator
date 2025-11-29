@@ -281,10 +281,85 @@ export class WASMSignRecognizer {
     return this.recognizeFast(landmarks);
   }
 
+  private memoryPool: number[] = []; // 메모리 풀로 할당 최적화
+  private landmarkDataCache = new Float32Array(42); // 재사용 가능한 배열
+
   /**
-   * 랜드마크로부터 제스처 인식 (포인터 사용 - 더 빠름)
+   * 랜드마크로부터 제스처 인식 (포인터 사용 - 최적화됨)
    */
   async recognizeFast(landmarks: HandLandmark[]): Promise<RecognitionResult> {
+    if (!this.isInitialized || !this.recognizer || !this.wasmModule) {
+      return {
+        gesture: "감지되지 않음",
+        confidence: 0.0,
+        id: 0,
+      };
+    }
+
+    // HEAPF32 캐싱
+    const HEAPF32 = this.wasmModule.HEAPF32;
+    if (!HEAPF32) {
+      return {
+        gesture: "감지되지 않음",
+        confidence: 0.0,
+        id: 0,
+      };
+    }
+
+    try {
+      // 캐시된 배열 재사용 (메모리 할당 최소화)
+      for (let i = 0; i < 21; i++) {
+        if (landmarks[i]) {
+          this.landmarkDataCache[i * 2] = landmarks[i].x;
+          this.landmarkDataCache[i * 2 + 1] = landmarks[i].y;
+        } else {
+          this.landmarkDataCache[i * 2] = 0;
+          this.landmarkDataCache[i * 2 + 1] = 0;
+        }
+      }
+
+      // 메모리 풀 사용 (할당/해제 최적화)
+      let landmarksPtr = this.memoryPool.pop();
+      if (!landmarksPtr) {
+        landmarksPtr = this.wasmModule._malloc(42 * 4); // 새로 할당
+        if (landmarksPtr === 0) {
+          throw new Error("메모리 할당 실패");
+        }
+      }
+
+      // 빠른 메모리 복사
+      HEAPF32.set(this.landmarkDataCache, landmarksPtr / 4);
+
+      // recognizeFromPointer 호출 (로깅 최소화)
+      if (!this.recognizer.recognizeFromPointer) {
+        this.memoryPool.push(landmarksPtr); // 메모리 풀에 반환
+        throw new Error("recognizeFromPointer 함수 없음");
+      }
+
+      const resultJson = this.recognizer.recognizeFromPointer(landmarksPtr, 42);
+      
+      // 메모리 풀에 반환 (해제 대신)
+      if (this.memoryPool.length < 5) { // 최대 5개까지 풀링
+        this.memoryPool.push(landmarksPtr);
+      } else {
+        this.wasmModule._free(landmarksPtr);
+      }
+
+      // 빠른 JSON 파싱 (try-catch 최소화)
+      return JSON.parse(resultJson) as RecognitionResult;
+    } catch (error) {
+      return {
+        gesture: "감지되지 않음",
+        confidence: 0.0,
+        id: 0,
+      };
+    }
+  }
+
+  /**
+   * 레거시 느린 버전 (비교용)
+   */
+  async recognizeFromPointerSlow(landmarks: HandLandmark[]): Promise<RecognitionResult> {
     if (!this.isInitialized || !this.recognizer || !this.wasmModule) {
       return {
         gesture: "감지되지 않음",
@@ -426,6 +501,14 @@ export class WASMSignRecognizer {
    * 리소스 정리
    */
   dispose(): void {
+    // 메모리 풀 정리
+    if (this.wasmModule) {
+      this.memoryPool.forEach(ptr => {
+        this.wasmModule?._free(ptr);
+      });
+    }
+    this.memoryPool = [];
+    
     // WASM 모듈은 자동으로 정리됨
     this.recognizer = null;
     this.wasmModule = null;
