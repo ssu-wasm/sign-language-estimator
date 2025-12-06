@@ -10,4 +10,3 @@ export const loadHandsModule = async () => {
   }
   return null;
 };
-

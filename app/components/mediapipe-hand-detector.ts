@@ -11,21 +11,26 @@ export interface HandLandmark {
 }
 
 export interface HandDetectionResult {
-  landmarks: HandLandmark[];            
-  multiHandLandmarks: HandLandmark[][]; 
-  multiHandedness: any[];               
+  /** 한 손의 랜드마크 */
+  landmarks: HandLandmark[];
+  /** 여러 손의 랜드마크 */
+  multiHandLandmarks: HandLandmark[][];
+  /** 여러 손의 손잡이 라벨 */
+  multiHandedness: { label: string }[];
 }
 
 export class MediaPipeHandDetector {
   private hands: Hands | null = null;
   private camera: Camera | null = null;
   private isInitialized = false;
-  private currentResolve: ((result: HandDetectionResult | null) => void) | null = null;
+  private currentResolve:
+    | ((result: HandDetectionResult | null) => void)
+    | null = null;
 
   async initialize(): Promise<boolean> {
     try {
       const { Hands } = await import("@mediapipe/hands");
-      
+
       this.hands = new Hands({
         locateFile: (file) => {
           return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
@@ -34,7 +39,7 @@ export class MediaPipeHandDetector {
 
       // 기본값은 1개로 시작 (나중에 모드에 따라 바뀜)
       this.hands.setOptions({
-        maxNumHands: 1, 
+        maxNumHands: 1,
         modelComplexity: 1,
         minDetectionConfidence: 0.5,
         minTrackingConfidence: 0.5,
@@ -68,15 +73,15 @@ export class MediaPipeHandDetector {
 
     if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
       this.currentResolve({
-        landmarks: results.multiHandLandmarks[0],       
-        multiHandLandmarks: results.multiHandLandmarks, 
-        multiHandedness: results.multiHandedness        
+        landmarks: results.multiHandLandmarks[0],
+        multiHandLandmarks: results.multiHandLandmarks,
+        multiHandedness: results.multiHandedness,
       });
     } else {
       this.currentResolve(null);
     }
     this.currentResolve = null;
-  }
+  };
 
   detect(video: HTMLVideoElement): Promise<HandDetectionResult | null> {
     return new Promise((resolve) => {
@@ -87,9 +92,9 @@ export class MediaPipeHandDetector {
       if (this.currentResolve) this.currentResolve(null);
       this.currentResolve = resolve;
 
-      this.hands.send({ image: video }).catch(err => {
-          console.error("MediaPipe Send Error:", err);
-          resolve(null);
+      this.hands.send({ image: video }).catch((err) => {
+        console.error("MediaPipe Send Error:", err);
+        resolve(null);
       });
     });
   }

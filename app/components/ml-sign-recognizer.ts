@@ -9,7 +9,7 @@ import { WASMSignRecognizer } from "./wasm-sign-recognizer";
 export interface HandLandmark {
   x: number;
   y: number;
-  z?: number;
+  z: number;
 }
 
 export interface MLRecognitionResult {

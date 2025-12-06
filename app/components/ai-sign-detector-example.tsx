@@ -485,7 +485,7 @@ export default function AISignDetectorExample() {
         <div className={styles.headerContent}>
           <div className={styles.logo}>
             <span className={styles.logoIcon}>🤟</span>
-            <span className={styles.logoText}>후이즈유</span>
+            <span className={styles.logoText}>소리손</span>
           </div>
           <nav className={styles.navigation}>
             <Link
