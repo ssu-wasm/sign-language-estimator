@@ -1,0 +1,462 @@
+.container {
+  min-height: 100vh;
+  background: #ffffff;
+}
+
+/* Header */
+.header {
+  background: #ffffff;
+  border-bottom: 1px solid #e5e5e5;
+  padding: 20px 32px;
+  position: fixed;     /* sticky 대신 fixed 사용 */
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.headerContent {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 20px;
+  font-weight: 800;
+  color: #c8531a;
+}
+
+.logoIcon {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.logoText {
+  color: #c8531a;
+}
+
+.nav {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+/* Buttons */
+.btnPrimary {
+  background: #c8531a;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 0 #803611;
+}
+
+.btnPrimary:hover {
+  background: #a04315;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 #803611;
+}
+
+.btnPrimary:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #803611;
+}
+
+
+.btnSecondary {
+  background: #ffffff;
+  color: #C8531A;
+  border: 2px solid #803611;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 0 #803611;
+}
+
+.btnSecondary:hover {
+  background: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 #803611;
+}
+
+.btnSecondary:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #803611;
+}
+
+
+.btnLarge {
+  background: #c8531a;
+  color: white;
+  border: none;
+  padding: 16px 40px;
+  border-radius: 16px;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 0 #a04315;
+}
+
+.btnLarge:hover {
+  background: #a04315;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 0 #803611;
+}
+
+.btnLarge:active {
+  transform: translateY(3px);
+  box-shadow: 0 3px 0 #803611;
+}
+
+.btnOutline {
+  background: transparent;
+  color: #c8531a;
+  border: 3px solid #c8531a;
+  padding: 14px 40px;
+  border-radius: 16px;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btnOutline:hover {
+  background: #f8f8f8;
+  transform: translateY(-2px);
+}
+
+/* Hero Section */
+.hero {
+  padding: 80px 32px;
+  padding-top: 140px;  /* 헤더 높이만큼 여백 추가 */
+  background: #ffffff;
+}
+
+.heroContent {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 64px;
+  align-items: center;
+}
+
+.heroText {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.heroTitle {
+  font-size: 48px;
+  font-weight: 800;
+  color: #3c3c3c;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.highlight {
+  color: #c8531a;
+}
+
+.heroDescription {
+  font-size: 16px;
+  color: #777;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.heroButtons {
+  display: flex;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.heroImage {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.heroImagePlaceholder {
+  width: 400px;
+  height: 400px;
+  background: linear-gradient(135deg, #c8531a 0%, #64baaa 100%);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 20px 60px rgba(100, 186, 170, 0.3);
+  animation: float 3s ease-in-out infinite;
+}
+
+.heroEmoji {
+  font-size: 160px;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+/* Features Section */
+.features {
+  padding: 80px 32px;
+  background: #ffffff;
+}
+
+.featuresContent {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 48px;
+}
+
+.featureCard {
+  text-align: center;
+  padding: 32px;
+  border-radius: 20px;
+  background: #ffffff;
+  transition: all 0.3s ease;
+}
+
+.featureCard:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 10px 30px rgba(100, 186, 170, 0.15);
+}
+
+.featureIcon {
+  font-size: 64px;
+  margin-bottom: 16px;
+}
+
+.featureTitle {
+  font-size: 24px;
+  font-weight: 700;
+  color: #3c3c3c;
+  margin-bottom: 8px;
+}
+
+.featureDescription {
+  font-size: 16px;
+  color: #777;
+  line-height: 1.6;
+}
+
+/* Learn Section */
+.learnSection {
+  padding: 80px 32px;
+  background: #ffffff;
+}
+
+.learnContent {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.sectionTitle {
+  font-size: 40px;
+  font-weight: 800;
+  color: #3c3c3c;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.sectionSubtitle {
+  font-size: 19px;
+  color: #777;
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.signGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px;
+}
+
+.signCard {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 24px;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: 3px solid #f0f0f0;
+  box-shadow: none;
+}
+
+.signCard:hover {
+  transform: translateY(-10px);
+  border-color: #64baaa;
+  box-shadow: 0 10px 30px rgba(100, 186, 170, 0.2);
+}
+
+.signImageWrapper {
+  margin-bottom: 16px;
+}
+
+.signImage {
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.signImagePlaceholder {
+  width: 100%;
+  aspect-ratio: 1;
+  background: linear-gradient(135deg, #da9e83 0%, #64baaa 100%);
+  border-radius: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 8px 20px rgba(100, 186, 170, 0.3);
+}
+
+.signPlaceholderText {
+  font-size: 32px;
+  font-weight: 700;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.signWord {
+  font-size: 21px;
+  font-weight: 700;
+  color: #3c3c3c;
+  margin: 0;
+}
+
+/* CTA Section */
+.ctaSection {
+  padding: 80px 32px;
+  background: linear-gradient(135deg, #64baaa 0%, #c8531a 100%);
+}
+
+.ctaContent {
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.ctaTitle {
+  font-size: 40px;
+  font-weight: 800;
+  color: white;
+  margin-bottom: 16px;
+}
+
+.ctaDescription {
+  font-size: 19px;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 32px;
+}
+
+/* Footer */
+.footer {
+  padding: 48px 32px;
+  background: #ffffff;
+  border-top: 1px solid #e5e5e5;
+}
+
+.footerContent {
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.footerLogo {
+  display: inline-flex;
+  align-items: center;
+  width: 100px;
+  height: 100px;
+  margin-bottom: 16px;
+}
+
+.footerText {
+  color: #777;
+  font-size: 14px;
+}
+
+/* Responsive */
+@media (max-width: 968px) {
+  .heroContent {
+    grid-template-columns: 1fr;
+    gap: 48px;
+    text-align: center;
+  }
+
+  .heroButtons {
+    justify-content: center;
+  }
+
+  .featuresContent {
+    grid-template-columns: 1fr;
+  }
+
+  .signGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .heroTitle {
+    font-size: 40px;
+  }
+
+  .heroImagePlaceholder {
+    width: 300px;
+    height: 300px;
+  }
+
+  .heroEmoji {
+    font-size: 112px;
+  }
+}
+
+@media (max-width: 640px) {
+  .nav {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .btnPrimary,
+  .btnSecondary {
+    padding: 10px 16px;
+    font-size: 12px;
+  }
+
+  .signGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .heroButtons {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .btnLarge,
+  .btnOutline {
+    width: 100%;
+  }
+}
