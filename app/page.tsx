@@ -55,13 +55,20 @@ export default function Home() {
                 시작하기
               </button>
               <button className={styles.btnSecondary} onClick={scrollToLearn}>
-                수어 배우기
+                수어 배우러 가기
               </button>
             </div>
           </div>
           <div className={styles.heroImage}>
             <div className={styles.heroImagePlaceholder}>
-              <span className={styles.heroEmoji}>🤟</span>
+              <video
+                className={styles.heroVideo}
+                autoPlay
+                loop
+                muted
+                playsInline>
+                  <source src="/videos/hero_video1.mp4" type="video/mp4" />
+              </video>
             </div>
           </div>
         </div>
@@ -74,21 +81,21 @@ export default function Home() {
             <div className={styles.featureIcon}>📹</div>
             <h3 className={styles.featureTitle}>실시간 인식</h3>
             <p className={styles.featureDescription}>
-              웹캠을 통해 손동작을<br />실시간으로 인식합니다
+              웹캠을 통해 손동작을<br />실시간으로 인식합니다!
             </p>
           </div>
           <div className={styles.featureCard}>
             <div className={styles.featureIcon}>🔤</div>
             <h3 className={styles.featureTitle}>정확한 번역</h3>
             <p className={styles.featureDescription}>
-              인식한 수어를 바로<br />한국어로 번역합니다
+              인식한 수어를 바로<br />한국어로 번역합니다!
             </p>
           </div>
           <div className={styles.featureCard}>
             <div className={styles.featureIcon}>💚</div>
             <h3 className={styles.featureTitle}>무료 서비스</h3>
             <p className={styles.featureDescription}>
-              회원가입 없이<br />누구나 무료로 사용
+              회원가입 없이<br />누구나 무료로 사용 가능합니다!
             </p>
           </div>
         </div>
@@ -98,11 +105,55 @@ export default function Home() {
       <section id="learn-section" className={styles.learnSection}>
         <div className={styles.learnContent}>
           <h2 className={styles.sectionTitle}>
-            수어를 배워보세요
+            수어를 배워보아요!
           </h2>
           <p className={styles.sectionSubtitle}>
-            자주 사용하는 수어 표현들을 익혀보세요
+            자주 사용하는 수어 표현들을 익혀보세요 ☺️
           </p>
+{/* Quick Tips Section */}
+          <div className={styles.quickTipsWrapper}>
+            <h3 className={styles.quickTipsTitle}>💡 핵심만 콕!</h3>
+            <div className={styles.quickTips}>
+              <div className={styles.tipCard}>
+                <div className={styles.tipIcon}>🤟</div>
+                <h3 className={styles.tipTitle}>수어란?</h3>
+                <p className={styles.tipText}>
+                  손, 얼굴 표정, 몸짓을 사용하는 시각적 언어로,<br />
+                  한국 수어는 한국어와 문법 체계가 다른 독립적인 언어입니다.<br /> 
+                  조사(~은/는/이/가)가 없고,<br /> 
+                  상황에 따라 어순이 바뀌기도 해요.
+                </p>
+                <p className={styles.tipSubtext}>
+                  🌍 국가마다 수어가 달라요 (미국수어, 일본수어 등 모두 다름)
+                </p>
+              </div>
+
+              <div className={styles.tipCard}>
+                <div className={styles.tipIcon}>😊</div>
+                <h3 className={styles.tipTitle}>표정도 '말'의 일부예요</h3>
+                <p className={styles.tipText}>
+                  손짓뿐만 아니라 눈썹의 움직임, 입 모양, 고개 끄덕임이<br />
+                  질문, 긍정, 의문 등을 결정하는 중요한 문법 요소입니다.
+                    
+                    
+                </p>
+                <p className={styles.tipSubtext}>
+                  비수지 기호: 손을 사용하지 않고 얼굴 표정이나 몸짓으로 의미를 전달하는 것
+                </p>
+              </div>
+
+              <div className={styles.tipCard}>
+                <div className={styles.tipIcon}>🙏</div>
+                <h3 className={styles.tipTitle}>존댓말은 '표정'으로 해요</h3>
+                <p className={styles.tipText}>
+                  수어 단어 자체에는 존댓말/반말 구분이 없지만,<br />
+                  공손한 표정과 동작의 속도, 크기를 조절하여<br /> 
+                  정중함을 표현합니다.
+                </p>
+              </div>
+            </div>
+          </div>
+            <h3 className={styles.quickTipsTitle}>💡 수어 표현</h3>
           <div className={styles.signGrid}>
             {signLanguageWords.map((item, index) => (
               <div key={index} className={styles.signCard}>
@@ -122,10 +173,10 @@ export default function Home() {
       <section className={styles.ctaSection}>
         <div className={styles.ctaContent}>
           <h2 className={styles.ctaTitle}>
-            지금 바로 시작해보세요
+            지금 바로 시작해보세요!
           </h2>
           <p className={styles.ctaDescription}>
-            복잡한 설치나 회원가입 없이 바로 사용 가능합니다
+            복잡한 설치나 회원가입 없이 바로 사용 가능합니다.
           </p>
           <button className={styles.btnLarge}>
             시작하기
