@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import styles from "./page.module.css";
 
 export default function Home() {
@@ -148,7 +148,9 @@ export default function Home() {
 
               <div className={styles.tipCard}>
                 <div className={styles.tipIcon}>😊</div>
-                <h3 className={styles.tipTitle}>표정도 '말'의 일부예요</h3>
+                <h3 className={styles.tipTitle}>
+                  표정도 &apos;말&apos;의 일부예요
+                </h3>
                 <p className={styles.tipText}>
                   손짓뿐만 아니라 눈썹의 움직임, 입 모양, 고개 끄덕임이
                   <br />
@@ -162,7 +164,9 @@ export default function Home() {
 
               <div className={styles.tipCard}>
                 <div className={styles.tipIcon}>🙏</div>
-                <h3 className={styles.tipTitle}>존댓말은 '표정'으로 해요</h3>
+                <h3 className={styles.tipTitle}>
+                  존댓말은 &apos;표정&apos;으로 해요
+                </h3>
                 <p className={styles.tipText}>
                   수어 단어 자체에는 존댓말/반말 구분이 없지만,
                   <br />
