@@ -39,6 +39,8 @@ jobs:
         run: pnpm install
 
       - name: Build
+        env:
+          NEXT_PUBLIC_BASE_PATH: /${{ github.event.repository.name }}
         run: pnpm build
 
       - name: Setup Pages
