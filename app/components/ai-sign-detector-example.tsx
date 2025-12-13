@@ -7,6 +7,12 @@ import { MediaPipeHandDetector, HandLandmark } from "./mediapipe-hand-detector";
 
 import styles from "./SignDetector.module.css";
 
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
+
+const getAssetPath = (path: string) => {
+  return `${basePath}${path}`;
+};
+
 interface RecognitionResult {
   gesture: string;
   confidence: number;
@@ -289,7 +295,7 @@ export default function AISignDetectorExample() {
 
         if (success) {
           try {
-            const res = await fetch("/models/scaler.json");
+            const res = await fetch(getAssetPath("/models/scaler.json"));
             if (res.ok) {
               const data = await res.json();
               recognizer.setScaler(data.mean, data.scale);
@@ -494,7 +500,7 @@ export default function AISignDetectorExample() {
             >
               수화 인식
             </Link>
-            <Link href="/about" className={styles.navItem}>
+            <Link href="/" className={styles.navItem}>
               소개
             </Link>
           </nav>

@@ -6,6 +6,12 @@
 
 import { HandLandmark } from "./mediapipe-hand-detector";
 
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
+
+const getWasmPath = (path: string) => {
+  return `${basePath}${path}`;
+};
+
 export interface RecognitionResult {
   gesture: string;
   confidence: number;
@@ -81,7 +87,7 @@ export class WASMSignRecognizer {
       // 1. WASM 스크립트 로드
       if (typeof CreateSignWasmModule === "undefined") {
         const script = document.createElement("script");
-        script.src = "/wasm/sign_wasm.js";
+        script.src = getWasmPath("/wasm/sign_wasm.js");
         await new Promise<void>((resolve, reject) => {
           script.onload = () => resolve();
           script.onerror = () => reject(new Error("WASM script load failed"));
@@ -99,7 +105,12 @@ export class WASMSignRecognizer {
       // 2. 모듈 생성
       console.log("🔄 WASM 모듈 생성 중...");
       this.wasmModule = await CreateSignWasmModule({
-        locateFile: (path) => (path.endsWith(".wasm") ? `/wasm/${path}` : path),
+        locateFile: (path) => {
+          if (path.endsWith(".wasm")) {
+            return getWasmPath(`/wasm/${path}`);
+          }
+          return path;
+        },
       });
 
       if (!this.wasmModule) throw new Error("Module is null");
