@@ -41,7 +41,11 @@ jobs:
       - name: Build
         env:
           NEXT_PUBLIC_BASE_PATH: /${{ github.event.repository.name }}
-        run: pnpm build
+        run: |
+          echo "Building with basePath: /${{ github.event.repository.name }}"
+          pnpm build
+          echo "Build completed. Checking output..."
+          ls -la out/ | head -10
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

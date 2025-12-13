@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
   /* config options here */
   output: 'export',
   basePath: basePath,
-  assetPrefix: basePath,
+  assetPrefix: basePath || undefined, // basePath가 있으면 assetPrefix도 설정
   reactCompiler: true,
   turbopack: {},
   webpack: (config, { isServer }) => {
