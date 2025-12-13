@@ -24,6 +24,12 @@ const nextConfig: NextConfig = {
       };
     }
 
+    // emsdk 디렉토리 제외
+    config.watchOptions = {
+      ...config.watchOptions,
+      ignored: ['**/node_modules/**', '**/emsdk/**'],
+    };
+
     return config;
   },
 };

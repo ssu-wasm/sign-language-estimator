@@ -3,14 +3,23 @@
 import { useRouter } from "next/navigation";
 import styles from "./page.module.css";
 
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
+
+const getAssetPath = (path: string) => {
+  return `${basePath}${path}`;
+};
+
 export default function Home() {
   const router = useRouter();
 
   const signLanguageWords = [
-    { word: "안녕 / 안녕하세요", image: "/images/hello.png" },
-    { word: "사랑해 / 사랑해요", image: "/images/loveyou.jpg" },
-    { word: "고마워 / 감사해요", image: "/images/thanks.png" },
-    { word: "반가워 / 반가워요", image: "/images/goodtoseeyou.png" },
+    { word: "안녕 / 안녕하세요", image: getAssetPath("/images/hello.png") },
+    { word: "사랑해 / 사랑해요", image: getAssetPath("/images/loveyou.jpg") },
+    { word: "고마워 / 감사해요", image: getAssetPath("/images/thanks.png") },
+    {
+      word: "반가워 / 반가워요",
+      image: getAssetPath("/images/goodtoseeyou.png"),
+    },
   ];
 
   const scrollToLearn = () => {
@@ -29,7 +38,10 @@ export default function Home() {
       <header className={styles.header}>
         <div className={styles.headerContent}>
           <div className={styles.logo}>
-            <img src="/images/symbol_logo.svg" className={styles.logoIcon} />
+            <img
+              src={getAssetPath("/images/symbol_logo.svg")}
+              className={styles.logoIcon}
+            />
             <span className={styles.logoText}>Sorison</span>
           </div>
           <nav className={styles.nav}>
@@ -78,7 +90,10 @@ export default function Home() {
                 muted
                 playsInline
               >
-                <source src="/videos/hero_video1.mp4" type="video/mp4" />
+                <source
+                  src={getAssetPath("/videos/hero_video1.mp4")}
+                  type="video/mp4"
+                />
               </video>
             </div>
           </div>
@@ -211,7 +226,7 @@ export default function Home() {
         <div className={styles.footerContent}>
           <div className={styles.footerLogo}>
             <img
-              src="/images/Combination_Mark.svg"
+              src={getAssetPath("/images/Combination_Mark.svg")}
               className={styles.footerLogo}
             />
           </div>
