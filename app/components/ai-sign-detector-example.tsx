@@ -6,6 +6,7 @@ import { WASMSignRecognizer } from "./wasm-sign-recognizer";
 import { MediaPipeHandDetector, HandLandmark } from "./mediapipe-hand-detector";
 
 import styles from "./SignDetector.module.css";
+import Image from "next/image";
 
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
 
@@ -490,8 +491,12 @@ export default function AISignDetectorExample() {
       <header className={styles.header}>
         <div className={styles.headerContent}>
           <div className={styles.logo}>
-            <span className={styles.logoIcon}>🤟</span>
-            <span className={styles.logoText}>소리손</span>
+            <Image
+              src={getAssetPath("/images/symbol_logo.svg")}
+              alt="logo"
+              width={32}
+              height={32}
+            />
           </div>
           <nav className={styles.navigation}>
             <Link
